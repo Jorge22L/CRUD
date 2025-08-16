@@ -1,9 +1,19 @@
+using Application.Commons.Mappings;
 using Infrastructure.Interfaces;
 using Infrastructure.Services;
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configuración Global de Mapster
+var config = TypeAdapterConfig.GlobalSettings;
+config.Scan(typeof(MappingConfig).Assembly);
+
+builder.Services.AddSingleton(config);
+builder.Services.AddScoped<IMapper, ServiceMapper>();
 
 // Conexion a la base de datos
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
