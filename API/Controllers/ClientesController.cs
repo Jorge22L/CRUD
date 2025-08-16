@@ -1,5 +1,6 @@
 ﻿using Application.Clientes.Commands;
 using Domain.Entities;
+using FluentValidation;
 using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,16 @@ namespace API.Controllers
     public class ClientesController : ControllerBase
     {
         private readonly IClienteService _clienteService;
+        private readonly IValidator<CrearClienteCommand> _crearClienteCommandValidator;
+        private readonly IValidator<ActualizarClienteCommand> _actualizarClienteCommandValidator;
 
-        public ClientesController(IClienteService clienteService)
+        public ClientesController(IClienteService clienteService, 
+            IValidator<CrearClienteCommand> crearClienteCommandValidator, 
+            IValidator<ActualizarClienteCommand> actualizarClienteCommandValidator)
         {
             _clienteService = clienteService;
+            _crearClienteCommandValidator = crearClienteCommandValidator;
+            _actualizarClienteCommandValidator = actualizarClienteCommandValidator;
         }
 
         [HttpGet]
@@ -36,6 +43,9 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<Cliente>> Post(CrearClienteCommand command)
         {
+            var validation = _crearClienteCommandValidator.Validate(command);
+            if (!validation.IsValid) return BadRequest(FormatValidationErrors(validation));
+
             var id = await _clienteService.CrearClienteAsync(command);
             return CreatedAtAction(nameof(Get), new { id }, command);
         }
@@ -43,6 +53,9 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<Cliente>> Put(int id, ActualizarClienteCommand command)
         {
+            var validation = _actualizarClienteCommandValidator.Validate(command);
+            if (!validation.IsValid) return BadRequest(FormatValidationErrors(validation));
+
             var actualizado = await _clienteService.ActualizarClienteAsync(id, command);
             if (!actualizado) return NotFound();
 
@@ -56,6 +69,20 @@ namespace API.Controllers
             if (!eliminado) return NotFound();
 
             return Ok(eliminado);
+        }
+
+        private object FormatValidationErrors(FluentValidation.Results.ValidationResult validationResult)
+        {
+            var detalles = validationResult.Errors
+                .Select(e => new
+                {
+                    Campo = e.PropertyName,
+                    Mensaje = e.ErrorMessage,
+                    Codigo = e.ErrorCode,
+                    Severidad = e.Severity.ToString()
+                }).ToList();
+
+            return detalles;
         }
         
     }

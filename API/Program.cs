@@ -1,4 +1,7 @@
+using Application.Clientes.Commands;
+using Application.Clientes.Validators;
 using Application.Commons.Mappings;
+using FluentValidation;
 using Infrastructure.Interfaces;
 using Infrastructure.Services;
 using Mapster;
@@ -24,6 +27,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+// Agregando FluentValidation
+builder.Services.AddScoped<IValidator<CrearClienteCommand>, CrearClienteCommandValidator>();
+builder.Services.AddScoped<IValidator<ActualizarClienteCommand>, ActualizarClienteCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CrearClienteCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ActualizarClienteCommandValidator>();
 
 // Agregando servicios de Infraestructura
 builder.Services.AddScoped<IClienteService, ClienteService>();
