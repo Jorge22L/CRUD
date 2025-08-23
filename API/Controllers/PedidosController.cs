@@ -1,0 +1,72 @@
+﻿using Application.Interfaces;
+using Application.Pedidos.Commands;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace API.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class PedidosController : ControllerBase
+    {
+        private readonly IPedidoService _pedidoService;
+
+        public PedidosController(IPedidoService pedidoService)
+        {
+            _pedidoService = pedidoService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var pedidos = await _pedidoService.ObtenerTodosAsync();
+            return Ok(pedidos);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var pedido = await _pedidoService.ObtenerPorIdAsync(id);
+            if (pedido == null) return NotFound();
+            return Ok(pedido);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Post(CrearPedidoCommand command)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var pedidoId = await _pedidoService.CrearPedidoAsync(command);
+            return CreatedAtAction(nameof(Get), new { id = pedidoId }, new { id = pedidoId });
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ActualizarPedido(int id, [FromBody] ActualizarPedidoCommand command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _pedidoService.ActualizarPedidoAsync(id, command);
+            if (!result)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> EliminarPedido(int id)
+        {
+            var result = await _pedidoService.EliminarPedidoAsync(id);
+            if (!result)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
+    }
+}

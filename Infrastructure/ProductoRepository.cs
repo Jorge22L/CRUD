@@ -25,6 +25,12 @@ namespace Infrastructure
             await _context.SaveChangesAsync();
         }
 
+        public async Task ActualizarRangoAsync(List<Producto> productos)
+        {
+            _context.Productos.UpdateRange(productos);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task CrearProductoAsync(Producto producto)
         {
             _context.Productos.Add(producto);
@@ -44,6 +50,13 @@ namespace Infrastructure
         public async Task<Producto?> ObtenerPorIdAsync(int id)
         {
             return await _context.Productos.FindAsync(id);
+        }
+
+        public async Task<List<Producto>> ObtenerProductosPorIdsAsync(List<int> ids)
+        {
+            return await _context.Productos
+                .Where(p => ids.Contains(p.ProductoId))
+                .ToListAsync();
         }
 
         public async Task<List<Producto>> ObtenerTodosAsync()

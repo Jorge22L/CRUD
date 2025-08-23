@@ -11,9 +11,12 @@ namespace Domain.Interfaces
     {
         Task<List<Producto>> ObtenerTodosAsync();
         Task<Producto?> ObtenerPorIdAsync(int id);
+        Task<List<Producto>> ObtenerProductosPorIdsAsync(List<int> ids);
         Task CrearProductoAsync(Producto producto);
         Task ActualizarProductoAsync(Producto producto);
         Task EliminarProductoAsync(int id);
+
+        Task ActualizarRangoAsync(List<Producto> productos);
 
     }
 }
