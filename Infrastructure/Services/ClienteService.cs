@@ -1,7 +1,7 @@
 ﻿using Application.Clientes.Commands;
 using Application.Clientes.Queries;
+using Application.Interfaces;
 using Domain.Entities;
-using Infrastructure.Interfaces;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Persistence;

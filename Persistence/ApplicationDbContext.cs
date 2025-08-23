@@ -13,7 +13,7 @@ namespace Persistence
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<Cliente> Clientes => Set<Cliente>();
-        public DbSet<Producto> Producto => Set<Producto>();
+        public DbSet<Producto> Productos => Set<Producto>();
         public DbSet<Pedido> Pedidos => Set<Pedido>();
         public DbSet<DetallePedido> DetallePedidos => Set<DetallePedido>(); 
     }

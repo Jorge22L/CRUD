@@ -1,7 +1,7 @@
 ﻿using Application.Clientes.Commands;
+using Application.Interfaces;
 using Domain.Entities;
 using FluentValidation;
-using Infrastructure.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

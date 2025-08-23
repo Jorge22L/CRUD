@@ -1,8 +1,11 @@
 using Application.Clientes.Commands;
 using Application.Clientes.Validators;
 using Application.Commons.Mappings;
+using Application.Interfaces;
+using Application.Producto.Commands;
+using Domain.Interfaces;
 using FluentValidation;
-using Infrastructure.Interfaces;
+using Infrastructure;
 using Infrastructure.Services;
 using Mapster;
 using MapsterMapper;
@@ -33,9 +36,14 @@ builder.Services.AddScoped<IValidator<CrearClienteCommand>, CrearClienteCommandV
 builder.Services.AddScoped<IValidator<ActualizarClienteCommand>, ActualizarClienteCommandValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<CrearClienteCommandValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<ActualizarClienteCommandValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CrearProductoCommand>();
+builder.Services.AddValidatorsFromAssemblyContaining<ActualizarProductoCommand>();
 
 // Agregando servicios de Infraestructura
+builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<IProductoService, ProductoService>();
+
 
 builder.Services.AddOpenApi();
 

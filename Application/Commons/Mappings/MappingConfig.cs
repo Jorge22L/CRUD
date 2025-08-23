@@ -1,5 +1,7 @@
 ﻿using Application.Clientes.Commands;
 using Application.Clientes.Queries;
+using Application.Producto.Commands;
+using Application.Producto.Queries;
 using Domain.Entities;
 using Mapster;
 using System;
@@ -17,10 +19,15 @@ namespace Application.Commons.Mappings
             // Entidad <-> DTO
             config.NewConfig<Cliente, ClienteDto>();
             config.NewConfig<ClienteDto, Cliente>();
+            config.NewConfig<Domain.Entities.Producto, ProductoDto>();
+            config.NewConfig<ProductoDto, Domain.Entities.Producto>();
 
             // Command <-> Entidad
             config.NewConfig<CrearClienteCommand, Cliente>();
             config.NewConfig<ActualizarClienteCommand, Cliente>();
+            config.NewConfig<Domain.Entities.Producto, CrearProductoCommand>();
+            config.NewConfig<Domain.Entities.Producto, ActualizarProductoCommand>();
+
         }
     }
 }
