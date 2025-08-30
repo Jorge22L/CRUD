@@ -125,11 +125,23 @@ namespace Infrastructure.Services
 
         public async Task<bool> EliminarPedidoAsync(int id)
         {
-            var pedido = await _context.Pedidos.FindAsync(id);
-            if (pedido == null) return false;
-            _context.Pedidos.Remove(pedido);
-            await _context.SaveChangesAsync();
-            return true;
+            var parameters = new[]
+            {
+                new SqlParameter("@PedidoId", id)
+            };
+
+            try
+            {
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.EliminarPedido @PedidoId", parameters);
+
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error al eliminar el pedido: {ex.Message}");
+                return false;
+            }
         }
 
         public async Task<List<Pedido>> ObtenerPorClienteAsync(int clienteId)

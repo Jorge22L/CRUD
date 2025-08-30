@@ -67,27 +67,7 @@ namespace Application.Pedidos.Services
 
         public async Task<bool> EliminarPedidoAsync(int id)
         {
-            var pedido = await _pedidoRepository.ObtenerPorIdAsync(id);
-            if(pedido == null) return false;
-
-            if(pedido.Estado != "Pendiente")
-            {
-                throw new InvalidOperationException("Solo se pueden eliminar pedidos en estado 'Pendiente'.");
-            }
-
-            var productos = await _productoRepository.ObtenerProductosPorIdsAsync(
-                pedido.Detalles.Select(d => d.ProductoId).ToList());
-
-            foreach(var detalle in pedido.Detalles)
-            {
-                var producto = productos.First(p => p.ProductoId == detalle.ProductoId);
-                producto.Existencias += detalle.Cantidad;
-            }
-
-            await _productoRepository.ActualizarRangoAsync(productos);
-            await _pedidoRepository.EliminarPedidoAsync(id);
-
-            return true;
+            return await _pedidoRepository.EliminarPedidoAsync(id);
         }
 
         public async Task<List<PedidoDto>> ObtenerPorClienteAsync(int clienteId)

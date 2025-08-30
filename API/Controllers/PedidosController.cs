@@ -61,9 +61,9 @@ namespace API.Controllers
             var result = await _pedidoService.EliminarPedidoAsync(id);
             if (!result)
             {
-                return NotFound();
+                return NotFound(new {mensaje = "Pedido no encontrado"});
             }
-            return NoContent();
+            return Ok(new {mensaje = "Pedido eliminado exitosamente"});
         }
     }
 }
