@@ -21,11 +21,48 @@ namespace Infrastructure.Services
         {
             _context = context;
         }
-        public async Task<bool> ActualizarPedidoAsync(Pedido pedido)
+        public async Task<Pedido?> ActualizarPedidoAsync(int pedidoId, Pedido pedido)
         {
-            _context.Entry(pedido).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return true;
+            string? detallesJson = null;
+
+            // Solo crear JSON si hay detalles
+            if (pedido.Detalles != null && pedido.Detalles.Any())
+            {
+                detallesJson = JsonSerializer.Serialize(pedido.Detalles.Select(
+                    d => new
+                    {
+                        ProductoId = d.ProductoId,
+                        Cantidad = d.Cantidad,
+                        PrecioUnitario = d.PrecioUnitario,
+                        Descuento = d.Descuento,
+                        TieneIVA = d.TieneIVA
+                    }));
+            }
+
+            var parameters = new[]
+            {
+                new SqlParameter("@PedidoId", pedidoId),
+                new SqlParameter("@ClienteId", pedido.ClienteId > 0 ? pedido.ClienteId : DBNull.Value),
+                new SqlParameter("@FormaPago", !string.IsNullOrEmpty(pedido.FormaPago) ? pedido.FormaPago : DBNull.Value),
+                new SqlParameter("@Estado", !string.IsNullOrEmpty(pedido.Estado) ? pedido.Estado : DBNull.Value),
+                new SqlParameter("@DetallesJson", detallesJson ?? (object)DBNull.Value)
+            };
+
+            try
+            {
+                // Debug: Imprimir el JSON para verificar
+                Console.WriteLine($"DetallesJson: {detallesJson}");
+
+                await _context.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.ActualizarPedido @PedidoId, @ClienteId, @FormaPago, @Estado, @DetallesJson",
+                    parameters);
+
+                return await ObtenerPorIdAsync(pedidoId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al actualizar el pedido: {ex.Message}", ex);
+            }
         }
 
         public async Task CambiarEstadoPedidoAsync(int id, string nuevoEstado)
@@ -78,7 +115,7 @@ namespace Infrastructure.Services
 
             var pedidoCreado = pedidos.FirstOrDefault();
 
-            if(pedidoCreado == null)
+            if (pedidoCreado == null)
             {
                 throw new Exception("Error al crear el pedido.");
             }

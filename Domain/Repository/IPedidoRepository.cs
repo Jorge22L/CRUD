@@ -11,7 +11,7 @@ namespace Domain.Repository
         Task<Pedido?> ObtenerPorIdAsync(int id);
         Task<List<Pedido>> ObtenerPorClienteAsync(int clienteId);
         Task<int> CrearPedidoAsync(Pedido pedido);
-        Task<bool> ActualizarPedidoAsync(Pedido pedido);
+        Task<Pedido> ActualizarPedidoAsync(int pedidoId, Pedido pedido);
         Task<bool> EliminarPedidoAsync(int id);
         Task CambiarEstadoPedidoAsync(int id, string nuevoEstado);
         Task CompletarPedidoAsync(int id);

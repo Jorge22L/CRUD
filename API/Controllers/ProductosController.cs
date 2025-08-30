@@ -54,7 +54,7 @@ namespace API.Controllers
             if (!validation.IsValid) return BadRequest(FormatValidationErrors(validation));
             var actualizado = await _productoService.ActualizarProductoAsync(id, command);
             if (!actualizado) return NotFound();
-            return NoContent();
+            return Ok(actualizado);
         }
 
         [HttpDelete("{id}")]

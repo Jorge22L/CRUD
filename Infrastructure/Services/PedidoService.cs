@@ -26,94 +26,22 @@ namespace Application.Pedidos.Services
             _productoRepository = productoRepository;
             _mapper = mapper;
         }
-        public async Task<bool> ActualizarPedidoAsync(int id, ActualizarPedidoCommand command)
+        public async Task<PedidoDto> ActualizarPedidoAsync(int id, ActualizarPedidoCommand command)
         {
-            var pedido = await _pedidoRepository.ObtenerPorIdAsync(id);
-            if (pedido == null) return false;
+            var pedido = _mapper.Map<Pedido>(command);
+            var pedidoActualizado = await _pedidoRepository.ActualizarPedidoAsync(id, pedido);
 
-            if(pedido.Estado != "Pendiente")
-            {
-                throw new Exception("Solo se pueden actualizar pedidos en estado 'Pendiente'.");
-            }
-
-            // Restaurar stock de detalles existentes
-            var productosOriginales = await _productoRepository.ObtenerProductosPorIdsAsync(
-                pedido.Detalles.Select(d => d.ProductoId).ToList());
-
-            foreach(var detalle in pedido.Detalles)
-            {
-                var producto = productosOriginales.First(p => p.ProductoId == detalle.ProductoId);
-                producto.Existencias += detalle.Cantidad;
-            }
-
-            // Mapear nuevos detalles
-            _mapper.Map(command, pedido);
-
-            if(command.Detalles != null && command.Detalles.Any())
-            {
-                pedido.Detalles.Clear();
-
-                var productosNuevos = await _productoRepository.ObtenerProductosPorIdsAsync(
-                    command.Detalles.Select(d => d.ProductoId).ToList());
-
-                foreach(var detalle in command.Detalles)
-                {
-                    var producto = productosNuevos.First(p => p.ProductoId == detalle.ProductoId);
-                    if(producto.Existencias < detalle.Cantidad)
-                    {
-                        throw new Exception($"No hay stock suficiente para el producto {producto.Nombre}.");
-                    }
-                    var detallePedido = _mapper.Map<Domain.Entities.DetallePedido>(detalle);
-                    pedido.Detalles.Add(detallePedido);
-                    producto.Existencias -= detalle.Cantidad;
-                }
-
-                await _productoRepository.ActualizarRangoAsync(productosOriginales.Concat(productosNuevos).ToList());
-            }
-
-            CalcularTotalesPedido(pedido);
-            await _pedidoRepository.ActualizarPedidoAsync(pedido);
-
-            return true;
+            return pedidoActualizado != null ? _mapper.Map<PedidoDto>(pedidoActualizado) : null;
         }
 
         public async Task<bool> CambiarEstadoPedidoAsync(int id, string nuevoEstado)
         {
-            var pedido = await _pedidoRepository.ObtenerPorIdAsync(id);
-            if(pedido == null ) return false;
-
-            var estadosValidos = new List<string> { "Pendiente", "Procesando", "Completado", "Cancelado" };
-            if(!estadosValidos.Contains(nuevoEstado))
-            {
-                throw new Exception("Estado no válido.");
-            }
-
-            pedido.Estado = nuevoEstado;
-            await _pedidoRepository.ActualizarPedidoAsync(pedido);
-            return true;
+            throw new NotImplementedException();
         }
 
         public async Task<bool> CancelarPedidoAsync(int id)
         {
-            var pedido = await _pedidoRepository.ObtenerPorIdAsync(id);
-            if(pedido == null) return false;
-            if(pedido.Estado == "Pendiente")
-            {
-                var productos = await _productoRepository.ObtenerProductosPorIdsAsync(
-                    pedido.Detalles.Select(d => d.ProductoId).ToList());
-
-                foreach(var detalle in pedido.Detalles)
-                {
-                    var producto = productos.First(p => p.ProductoId == detalle.ProductoId);
-                    producto.Existencias += detalle.Cantidad;
-                }
-
-                await _productoRepository.ActualizarRangoAsync(productos);
-            }
-
-            pedido.Estado = "Cancelado";
-            await _pedidoRepository.ActualizarPedidoAsync(pedido);
-            return true;
+            throw new NotImplementedException();
         }
 
         public async Task<bool> CompletarPedidoAsync(int id)

@@ -46,12 +46,13 @@ namespace API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var result = await _pedidoService.ActualizarPedidoAsync(id, command);
-            if (!result)
+            var pedidoActualizado = await _pedidoService.ActualizarPedidoAsync(id, command);
+
+            if (pedidoActualizado == null)
             {
                 return NotFound();
             }
-            return NoContent();
+            return Ok(pedidoActualizado);
         }
 
         [HttpDelete("{id}")]
