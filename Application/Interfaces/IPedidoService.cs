@@ -1,0 +1,20 @@
+﻿using Application.Pedidos.Commands;
+using Application.Pedidos.Queries;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Interfaces
+{
+    public interface IPedidoService
+    {
+        Task<PedidoDto> CrearPedidoAsync(CrearPedidoCommand command);
+        Task<PedidoDto> ActualizarPedidoAsync(int id, ActualizarPedidoCommand command);
+        Task<bool> EliminarPedidoAsync(int id);
+        Task<List<PedidoDto>> ObtenerTodosAsync();
+        Task<List<PedidoDto>> ObtenerPorClienteAsync(int clienteId);
+        Task<PedidoDto?> ObtenerPorIdAsync(int id);      
+    }
+}

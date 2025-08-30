@@ -41,8 +41,10 @@ builder.Services.AddValidatorsFromAssemblyContaining<ActualizarProductoCommandVa
 
 // Agregando servicios de Infraestructura
 builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
+builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<IPedidoService, PedidoService>();
 
 builder.Services.AddOpenApi();
 
