@@ -10,14 +10,9 @@ namespace Application.Pedidos.Commands
 {
     public class CrearPedidoCommand
     {
-        [Required]
         public int ClienteId { get; set; }
-        public DateTime Fecha { get; set; }
-        public decimal Descuento { get; set; }
-        [Required]
-        public string FormaPago { get; set; } = "Contado";
-
-        [Required]
-        public List<DetallePedidoCommand> Detalles { get; set; } = new List<DetallePedidoCommand>();
+        public string FormaPago { get; set; }
+        public string Estado { get; set; } = "Pendiente";
+        public List<DetallePedidoCommand> Detalles { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Application.Pedidos.Commands;
 using Application.Pedidos.Queries;
 using Domain.Entities;
 using Domain.Interfaces;
+using Domain.Repository;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -120,52 +121,20 @@ namespace Application.Pedidos.Services
             return await CambiarEstadoPedidoAsync(id, "Completado");
         }
 
-        public async Task<int> CrearPedidoAsync(CrearPedidoCommand command)
+        public async Task<PedidoDto> CrearPedidoAsync(CrearPedidoCommand command)
         {
-            // Validar que el cliente exista
-            var clienteExiste = await _pedidoRepository.ClienteExisteAsync(command.ClienteId);
-            if(!clienteExiste)
-            {
-                throw new Exception("El cliente no existe.");
-            }
-
-            // Verificar stock de productos
-            var productos = await _productoRepository.ObtenerProductosPorIdsAsync(
-                command.Detalles.Select(d => d.ProductoId).ToList());
-
-            if(productos.Count != command.Detalles.Count)
-            {
-                throw new Exception("Uno o más productos no existen.");
-            }
-
-            foreach(var detalle in command.Detalles)
-            {
-                var producto = productos.First(p => p.ProductoId == detalle.ProductoId);
-                if(producto.Existencias < detalle.Cantidad)
-                {
-                    throw new Exception($"No hay stock suficiente para el producto {producto.Nombre}.");
-                }
-            }
-
             var pedido = _mapper.Map<Pedido>(command);
-            pedido.Estado = "Pendiente";
 
-            // Crear detalles y actualizar stock
+            var pedidoId = await _pedidoRepository.CrearPedidoAsync(pedido);
 
-            foreach(var detalle in command.Detalles)
+            var pedidoCreado = await _pedidoRepository.ObtenerPorIdAsync(pedidoId);
+
+            if (pedidoCreado == null)
             {
-                var producto = productos.First(p => p.ProductoId == detalle.ProductoId);
-                var detallePedido = _mapper.Map<Domain.Entities.DetallePedido>(detalle);
-                pedido.Detalles.Add(detallePedido);
-                producto.Existencias -= detalle.Cantidad;
+                throw new Exception("Error al crear el pedido.");
             }
 
-            CalcularTotalesPedido(pedido);
-
-            await _pedidoRepository.CrearPedidoAsync(pedido);
-            await _productoRepository.ActualizarRangoAsync(productos);
-
-            return pedido.PedidoId;
+            return _mapper.Map<PedidoDto>(pedidoCreado);
         }
 
         public async Task<bool> EliminarPedidoAsync(int id)
@@ -229,5 +198,7 @@ namespace Application.Pedidos.Services
             pedido.IVA = totalIVA;
             pedido.Total = subtotal + totalIVA - pedido.Descuento;
         }
+
+      
     }
 }

@@ -3,9 +3,13 @@ using Application.Pedidos.Commands;
 using Application.Pedidos.Queries;
 using Domain.Entities;
 using Domain.Interfaces;
+using Domain.Repository;
 using MapsterMapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using System.Data;
+using System.Text.Json;
 
 namespace Infrastructure.Services
 {
@@ -51,9 +55,35 @@ namespace Infrastructure.Services
 
         public async Task<int> CrearPedidoAsync(Pedido pedido)
         {
-            _context.Pedidos.Add(pedido);
-            await _context.SaveChangesAsync();
-            return pedido.PedidoId;
+            var detallesJson = JsonSerializer.Serialize(pedido.Detalles.Select(
+                d => new
+                {
+                    ProductoId = d.ProductoId,
+                    Cantidad = d.Cantidad,
+                    PrecioUnitario = d.PrecioUnitario,
+                    Descuento = d.Descuento,
+                    TieneIVA = d.TieneIVA
+                }));
+
+            var parameters = new[]
+            {
+                new SqlParameter("@ClienteId", pedido.ClienteId),
+                new SqlParameter("@FormaPago", pedido.FormaPago),
+                new SqlParameter("@Estado", pedido.Estado ?? "Pendiente"),
+                new SqlParameter("@DetallesJson", detallesJson)
+            };
+
+            var pedidos = await _context.Pedidos.FromSqlRaw
+                ("EXEC dbo.GuardarPedido @ClienteId, @FormaPago, @Estado, @DetallesJson", parameters).ToListAsync();
+
+            var pedidoCreado = pedidos.FirstOrDefault();
+
+            if(pedidoCreado == null)
+            {
+                throw new Exception("Error al crear el pedido.");
+            }
+
+            return pedidoCreado.PedidoId;
         }
 
         public async Task<bool> EliminarPedidoAsync(int id)

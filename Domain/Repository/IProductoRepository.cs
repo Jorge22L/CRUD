@@ -17,6 +17,5 @@ namespace Domain.Interfaces
         Task EliminarProductoAsync(int id);
 
         Task ActualizarRangoAsync(List<Producto> productos);
-
     }
 }

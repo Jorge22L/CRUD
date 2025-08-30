@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Application.Pedidos.Commands;
+using Application.Pedidos.Queries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,15 +33,10 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(CrearPedidoCommand command)
+        public async Task<ActionResult<PedidoDto>> Post(CrearPedidoCommand command)
         {
-            if(!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var pedidoId = await _pedidoService.CrearPedidoAsync(command);
-            return CreatedAtAction(nameof(Get), new { id = pedidoId }, new { id = pedidoId });
+            var pedido = await _pedidoService.CrearPedidoAsync(command);
+            return CreatedAtAction(nameof(Get), new { id = pedido.PedidoId }, pedido);
         }
 
         [HttpPut("{id}")]

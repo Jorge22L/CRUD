@@ -59,6 +59,39 @@ namespace Application.Commons.Mappings
             config.NewConfig<List<Domain.Entities.DetallePedido>, List<DetallePedidoDto>>()
                 .MapWith(src => src.Adapt<List<DetallePedidoDto>>());
 
+
+            config.NewConfig<CrearProductoCommand, Domain.Entities.Producto>();
+            config.NewConfig<ActualizarProductoCommand, Domain.Entities.Producto>();
+
+            // Pedido
+            config.NewConfig<Pedido, PedidoDto>()
+                .Map(dest => dest.ClienteNombre, src => src.Cliente.Nombre);
+
+            config.NewConfig<PedidoDto, Pedido>();
+
+            config.NewConfig<Domain.Entities.DetallePedido, DetallePedidoDto>()
+                .Map(dest => dest.ProductoNombre, src => src.Producto.Nombre)
+                .Map(dest => dest.ProductoCodigo, src => src.Producto.Codigo)
+                .Map(dest => dest.TieneIVA, src => src.TieneIVA);
+
+            config.NewConfig<CrearPedidoCommand, Pedido>()
+                .Map(dest => dest.Estado, src => "Pendiente")
+                .Ignore(dest => dest.PedidoId);
+
+            config.NewConfig<ActualizarPedidoCommand, Pedido>()
+                .Ignore(dest => dest.PedidoId)
+                .Ignore(dest => dest.Detalles);
+
+            // Detalle Pedidos
+            config.NewConfig<DetallePedidoCommand, Domain.Entities.DetallePedido>()
+                .Ignore(dest => dest.DetalleId)
+                .Ignore(dest => dest.PedidoId);
+
+            config.NewConfig<List<DetallePedidoCommand>, List<Domain.Entities.DetallePedido>>()
+                .MapWith(src => src.Adapt<List<Domain.Entities.DetallePedido>>());
+
+            config.NewConfig<List<Domain.Entities.DetallePedido>, List<DetallePedidoDto>>()
+                .MapWith(src => src.Adapt<List<DetallePedidoDto>>());
         }
     }
 }

@@ -5,6 +5,7 @@ using Application.Interfaces;
 using Application.Pedidos.Services;
 using Application.Producto.Commands;
 using Domain.Interfaces;
+using Domain.Repository;
 using FluentValidation;
 using Infrastructure;
 using Infrastructure.Services;
@@ -47,6 +48,9 @@ builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
 
+builder.Services.AddScoped<IProductoService, ProductoService>();
+builder.Services.AddScoped<IClienteService, ClienteService>();
+builder.Services.AddScoped<IPedidoService, PedidoService>();
 
 builder.Services.AddOpenApi();
 
