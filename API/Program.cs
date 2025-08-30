@@ -10,6 +10,7 @@ using Infrastructure.Services;
 using Mapster;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using MiddlewareCustom;
 using Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,10 @@ builder.Services.AddScoped<IPedidoService, PedidoService>();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Middleware personalizado
+app.UseRequestLogging();
+app.UseExceptionHandling();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
