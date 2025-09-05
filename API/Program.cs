@@ -3,13 +3,16 @@ using Application.Clientes.Validators;
 using Application.Commons.Mappings;
 using Application.Interfaces;
 using Application.Producto.Validators;
+using Domain.Entities;
 using Domain.Repository;
 using FluentValidation;
 using Infrastructure;
 using Infrastructure.Services;
 using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MiddlewareCustom;
 using Persistence;
 
@@ -26,6 +29,37 @@ builder.Services.AddScoped<IMapper, ServiceMapper>();
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("ConexionSQL")));
 
+// Configuración de Identity
+builder.Services.AddIdentity<Usuario, IdentityRole>(opt =>
+{
+    opt.Password.RequireDigit = true;
+    opt.Password.RequiredLength = 6;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// Configuración de JWT
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = "Bearer";
+    options.DefaultChallengeScheme = "Bearer";
+})
+.AddJwtBearer("Bearer", opt =>
+{
+    opt.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Jwt:key"])),
+    };
+});
+
+builder.Services.AddAuthorization();
 
 // Add services to the container.
 
