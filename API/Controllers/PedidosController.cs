@@ -1,11 +1,13 @@
 ﻿using Application.Interfaces;
 using Application.Pedidos.Commands;
 using Application.Pedidos.Queries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PedidosController : ControllerBase
