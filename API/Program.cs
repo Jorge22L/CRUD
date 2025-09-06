@@ -89,13 +89,13 @@ builder.Services.AddAuthentication( opt =>
     };
 });
 
-//builder.Services.AddAuthorization(opt =>
-//{
-//    //Política global
-//    opt.FallbackPolicy = new AuthorizationPolicyBuilder()
-//            .RequireAuthenticatedUser()
-//            .Build();
-//});
+builder.Services.AddAuthorization(opt =>
+{
+    //Política global
+    opt.FallbackPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+});
 
 // Add services to the container.
 
@@ -177,11 +177,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
+
+    app.MapGet("/swagger/{**any}", () => Results.Redirect("/swagger/index.html"))
+        .WithMetadata(new AllowAnonymousAttribute());
 }
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 
