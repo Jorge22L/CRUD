@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report ScriptLanguage="CSharp" ReportInfo.Created="09/05/2025 23:48:42" ReportInfo.Modified="09/06/2025 00:22:29" ReportInfo.CreatorVersion="2025.2.0.0">
+  <ScriptText>using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Data;
+using FastReport;
+using FastReport.Data;
+using FastReport.Dialog;
+using FastReport.Barcode;
+using FastReport.Table;
+using FastReport.Utils;
+
+namespace FastReport
+{
+  public class ReportScript
+  {
+  }
+}
+</ScriptText>
+  <Dictionary>
+    <Parameter Name="ClienteId" DataType="System.Int32" AsString=""/>
+  </Dictionary>
+  <ReportPage Name="Page1" Watermark.Font="Arial, 60pt">
+    <ReportTitleBand Name="ReportTitle1" Width="718.2" Height="37.8">
+      <TextObject Name="Text1" Left="226.8" Top="9.45" Width="255.15" Height="28.35" Text="Reporte de Pedidos" HorzAlign="Center" Font="Arial, 18pt, style=Bold"/>
+    </ReportTitleBand>
+    <PageHeaderBand Name="PageHeader1" Top="41.8" Width="718.2" Height="37.8">
+      <TextObject Name="Text2" Top="9.45" Width="160.65" Height="28.35" Text="[Pedidos.PedidoId]" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text5" Left="255.15" Top="9.45" Width="94.5" Height="18.9" Text="Nombre" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text7" Left="368.55" Top="9.45" Width="94.5" Height="18.9" Text="Cantidad" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+    </PageHeaderBand>
+    <DataBand Name="Data1" Top="83.6" Width="718.2" Height="37.8">
+      <TextObject Name="Text3" Top="9.45" Width="236.25" Height="18.9" Text="[DetallePedidos.ProductoId]" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text4" Left="255.15" Top="9.45" Width="94.5" Height="18.9" Text="[Productos.Nombre]" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+      <TextObject Name="Text6" Left="368.55" Top="9.45" Width="217.35" Height="18.9" Text="[DetallePedidos.Cantidad]" HorzAlign="Center" Font="Arial, 12pt, style=Bold"/>
+    </DataBand>
+    <PageFooterBand Name="PageFooter1" Top="125.4" Width="718.2" Height="18.9">
+      <TextObject Name="Text8" Left="453.6" Width="132.3" Height="18.9" Text="[Pedidos.Total]" Format="Currency" Format.UseLocale="true" Format.DecimalDigits="2" HorzAlign="Right" WordWrap="false" Font="Arial, 12pt, style=Bold" Trimming="EllipsisCharacter"/>
+    </PageFooterBand>
+  </ReportPage>
+</Report>

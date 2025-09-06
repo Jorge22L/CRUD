@@ -125,6 +125,7 @@ builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
+builder.Services.AddScoped<IReporteService, ReporteService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

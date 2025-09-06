@@ -26,6 +26,14 @@ namespace API.Controllers
             return Ok(pedidos);
         }
 
+        [AllowAnonymous]
+        [HttpGet("{id}/reporte-fastreport/pdf")]
+        public async Task<IActionResult> ReporteFastReportPdf(int id, [FromServices] IReporteService fastReportService)
+        {
+            var bytes = await fastReportService.GenerarDetallePedidoPdfAsync(id);
+            return File(bytes, "application/pdf", $"pedido_{id}_fr.pdf");
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
