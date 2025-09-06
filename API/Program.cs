@@ -11,9 +11,11 @@ using Infrastructure.Services;
 using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MiddlewareCustom;
 using Persistence;
 using System.Diagnostics;
@@ -87,7 +89,13 @@ builder.Services.AddAuthentication( opt =>
     };
 });
 
-builder.Services.AddAuthorization();
+//builder.Services.AddAuthorization(opt =>
+//{
+//    //Política global
+//    opt.FallbackPolicy = new AuthorizationPolicyBuilder()
+//            .RequireAuthenticatedUser()
+//            .Build();
+//});
 
 // Add services to the container.
 
@@ -105,11 +113,54 @@ builder.Services.AddValidatorsFromAssemblyContaining<ActualizarProductoCommandVa
 // Agregando servicios de Infraestructura
 builder.Services.AddScoped<IProductoRepository, ProductoRepository>();
 builder.Services.AddScoped<IPedidoRepository, PedidoRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IPedidoService, PedidoService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 
-builder.Services.AddOpenApi();
+// Agregando swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "API de Pedidos",
+        Version = "v1",
+        Description = "Documentación de la API de Pedidos del Curso de Desarrollo de Aplicaciones Web con ASP.NET Core"
+    });
+
+    var securityScheme = new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Description = "Ingrese: Bearer {token}",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        Reference = new OpenApiReference
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
+        }
+    };
+
+    c.AddSecurityDefinition("Bearer", securityScheme);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>() 
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -117,10 +168,15 @@ var app = builder.Build();
 app.UseRequestLogging();
 app.UseExceptionHandling();
 
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
 }
 
 app.UseHttpsRedirection();

@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using Domain.Entities;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,6 +25,7 @@ namespace API.Controllers
             _actualizarClienteCommandValidator = actualizarClienteCommandValidator;
         }
 
+        [Authorize]
         [HttpGet]
         // https://localhost:7106/api/Clientes
         public async Task<IActionResult> Get()
