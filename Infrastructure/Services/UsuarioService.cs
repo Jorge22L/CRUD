@@ -19,11 +19,13 @@ namespace Infrastructure.Services
     {
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IConfiguration _configuration;
+        private readonly SymmetricSecurityKey _key;
 
-        public UsuarioService(IUsuarioRepository usuarioRepository, IConfiguration configuration)
+        public UsuarioService(IUsuarioRepository usuarioRepository, IConfiguration configuration, SymmetricSecurityKey key)
         {
             _usuarioRepository = usuarioRepository;
             _configuration = configuration;
+            _key = key;
         }
         public async Task<LoginResponse> LoginAsync(LoginDto loginDto)
         {
@@ -70,26 +72,30 @@ namespace Infrastructure.Services
 
         private string GenerateJwtToken(Usuario usuario)
         {
-            var claims = new[]
+            var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, usuario.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, usuario.Id),
+                new Claim(JwtRegisteredClaimNames.Email, usuario.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, usuario.Id),
                 new Claim(ClaimTypes.Name, usuario.NombreCompleto)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddHours(1),
-                signingCredentials: creds
-                );
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = creds,
+                Issuer = _configuration["Jwt:Issuer"]
+            };
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+
+            return tokenHandler.WriteToken(token);
         }
     }
 }
