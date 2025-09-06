@@ -10,6 +10,7 @@ namespace Domain.Repository
     public interface IProductoRepository
     {
         Task<List<Producto>> ObtenerTodosAsync();
+        Task<(List<Producto> Items, int TotalCount)> ObtenerPaginadosAsync(int page, int pageSize);
         Task<Producto?> ObtenerPorIdAsync(int id);
         Task CrearProductoAsync(Producto producto);
         Task ActualizarProductoAsync(Producto producto);

@@ -41,6 +41,24 @@ namespace Infrastructure
             }
         }
 
+        public async Task<(List<Producto> Items, int TotalCount)> ObtenerPaginadosAsync(int page, int pageSize)
+        {
+            if (page <= 0) page = 1;
+            if (pageSize <= 0) pageSize = 10;
+
+            var query = _context.Productos.AsQueryable();
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(p => p.ProductoId)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
+
         public async Task<Producto?> ObtenerPorIdAsync(int id)
         {
             return await _context.Productos.FindAsync(id);

@@ -1,4 +1,5 @@
-﻿using Application.Producto.Commands;
+﻿using Application.Commons;
+using Application.Producto.Commands;
 using Application.Producto.Queries;
 using System;
 using System.Collections.Generic;
@@ -15,5 +16,6 @@ namespace Application.Interfaces
         Task<int> CrearProductoAsync(CrearProductoCommand command);
         Task<ProductoDto> ActualizarProductoAsync(ActualizarProductoCommand command, int id);
         Task<bool> EliminarProductoAsync(int id);
+        Task<PagedResult<ProductoDto>> ObtenerPaginadosAsync(int page, int pageSize);
     }
 }
