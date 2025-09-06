@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application;
+using Application.Interfaces;
 using Application.Producto.Commands;
 using Application.Producto.Queries;
 using Domain.Interfaces;
@@ -48,6 +49,20 @@ namespace Infrastructure.Services
 
             await _productoRepository.EliminarProductoAsync(id);
             return true;
+        }
+
+        public async Task<PagedResult<ProductoDto>> ObtenerPaginadoAsync(int page, int pageSize)
+        {
+            var (items, totalcount) = await _productoRepository.ObtenerPaginadosAsync(page, pageSize);
+            var dtoItems = _mapper.Map<List<ProductoDto>>(items);
+
+            return new PagedResult<ProductoDto>
+            {
+                Items = dtoItems,
+                Page = page <= 0 ? 1 : page,
+                PageSize = pageSize <= 0 ? 10 : pageSize,
+                TotalCount = totalcount
+            };
         }
 
         public async Task<ProductoDto?> ObtenerPorIdAsync(int id)

@@ -15,5 +15,6 @@ namespace Application.Interfaces
         Task<int> CrearProductoAsync(CrearProductoCommand command);
         Task<bool> ActualizarProductoAsync(int id, ActualizarProductoCommand command);
         Task<bool> EliminarProductoAsync(int id);
+        Task<PagedResult<ProductoDto>> ObtenerPaginadoAsync(int page, int pageSize);
     }
 }

@@ -26,10 +26,31 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Producto>>> Get()
+        //public async Task<ActionResult<List<Producto>>> Get()
+        //{
+        //    var productos = await _productoService.ObtenerTodosAsync();
+        //    return Ok(productos);
+        //}
+        public async Task<ActionResult<List<Producto>>> Get(int page = 1, int pageSize = 10)
         {
-            var productos = await _productoService.ObtenerTodosAsync();
-            return Ok(productos);
+            if(Request.Query.Count == 0)
+            {
+                var productos = await _productoService.ObtenerTodosAsync();
+                return Ok(productos);
+            }
+
+            if (page <= 0) page = 1;
+            if (pageSize <= 0) pageSize = 10;
+
+            var result = await _productoService.ObtenerPaginadoAsync(page, pageSize);
+
+            // Incluir Metadatos en Headers
+            Response.Headers["X-Total-Count"] = result.TotalCount.ToString();
+            Response.Headers["X-Page"] = result.Page.ToString();
+            Response.Headers["X-Page-Size"] = result.PageSize.ToString();
+            Response.Headers["X-Total-Pges"] = result.TotalPages.ToString();
+
+            return Ok(result.Items);
         }
 
         [HttpGet("{id}")]
